@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -142,7 +143,7 @@ public class StatesAndCapitals
         // A11. Submit the average yearly precipitation across all state capitals
         // Use collect(averagingDouble())
 
-        Double averageYearlyPrecipitationAcrossStateCapitals = null;
+        Double averageYearlyPrecipitationAcrossStateCapitals =null;
 
         testResults.put("A11", StatesAndCapitalsCheck.adv11(averageYearlyPrecipitationAcrossStateCapitals));
 
@@ -150,22 +151,29 @@ public class StatesAndCapitals
         // Use collect(summingInt())  (PS: IntelliJ will warn you to use the version on the next line, but it's useful to see how summingInt() works)
         // Or use mapToInt() and sum()
 
-        Integer totalYearlyPrecipitationAcrossStateCapitals = null;
+
+        averageYearlyPrecipitationAcrossStateCapitals = states.stream().collect(averagingDouble(state -> state.getCapital().getAverageYearlyPrecipitationInInches()));
+        testResults.put("A11", StatesAndCapitalsCheck.adv11(averageYearlyPrecipitationAcrossStateCapitals));
+
+        // A12. Submit the total yearly precipitation across all state capitals
+        // Use collect(summingInt())  (PS: IntelliJ will warn you to use the version on the next line, but it's useful to see how summingInt() works)
+        // Or use mapToInt() and sum()
+
+        Integer totalYearlyPrecipitationAcrossStateCapitals =states.stream().collect(summingInt(value -> value.getCapital().getAverageYearlyPrecipitationInInches()));
 
         testResults.put("A12", StatesAndCapitalsCheck.adv12(totalYearlyPrecipitationAcrossStateCapitals));
 
         // A13. Submit how many states are in each time zone (or group of time zones)
         // Use collect(groupingBy()) and counting()
 
-        Map<String, Long> numberOfStatesByTimeZone = null;
+        Map<String, Long> numberOfStatesByTimeZone = states.stream().collect(groupingBy(stateInfo -> stateInfo.getTimeZones().toString(), counting()));
 
         testResults.put("A13", StatesAndCapitalsCheck.adv13(numberOfStatesByTimeZone));
 
         // A14. Submit how many state capitals are in each time zone
         // Use collect(groupingBy()) and counting()
 
-        Map<String, Long> numberOfStateCapitalsByTimeZone = null;
-
+        Map<String, Long> numberOfStateCapitalsByTimeZone =  states.stream().collect(Collectors.groupingBy(state -> state.getCapital().getTimeZone() , counting()));
         testResults.put("A14", StatesAndCapitalsCheck.adv14(numberOfStateCapitalsByTimeZone));
 
         // ***** Advanced 2 (requires map() + additional technique(s)) *****
@@ -173,28 +181,28 @@ public class StatesAndCapitals
         // A21. Submit all state trees, sorted alphabetically (ascending)
         // Use sorted() and map()
 
-        List<String> stateTreesSortedAscending = null;
+        List<String> stateTreesSortedAscending = states.stream().map(stateInfo -> stateInfo.getStateTree()).sorted().collect(toList());
 
         testResults.put("A21", StatesAndCapitalsCheck.adv21(stateTreesSortedAscending));
 
         // A22. Submit all state names, separated by "; "
         // Use collect(joining()) and map()
 
-        String allStateNamesSemicolonDelimited = null;
+        String allStateNamesSemicolonDelimited = states.stream().map(stateInfo -> stateInfo.getStateName()).collect(Collectors.joining("; "));
 
         testResults.put("A22", StatesAndCapitalsCheck.adv22(allStateNamesSemicolonDelimited));
 
         // A23. Submit all distinct state birds
         // Use distinct() and map()
 
-        List<String> allDistinctStateBirds = null;
+        List<String> allDistinctStateBirds = states.stream().map(value->value.getStateBird()).distinct().collect(Collectors.toList());
 
         testResults.put("A23", StatesAndCapitalsCheck.adv23(allDistinctStateBirds));
 
         // A24. Submit all distinct state birds, but with any kind of mockingbird removed
         // Use distinct(), map(), and filter()
 
-        List<String> allDistinctStateBirdsMinusMockingbirds = null;
+        List<String> allDistinctStateBirdsMinusMockingbirds = states.stream().filter(f->!f.getStateBird().contains("mockingbird")).map(value->value.getStateBird()).distinct().collect(Collectors.toList());;
 
         testResults.put("A24", StatesAndCapitalsCheck.adv24(allDistinctStateBirdsMinusMockingbirds));
 
@@ -202,7 +210,7 @@ public class StatesAndCapitals
         // Use collect(counting()), map(), and distinct()
         // PS: Don't use count(). IntelliJ will warn you but I want you to see how counting() works.
 
-        Long numberOfDistinctStateBirds = null;
+        Long numberOfDistinctStateBirds = states.stream().map(value->value.getStateBird()).distinct().collect(counting());;
 
         testResults.put("A25", StatesAndCapitalsCheck.adv25(numberOfDistinctStateBirds));
 
